@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <!-- Basic Page Needs
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+         <meta charset="utf-8">
+         <title>Bagalkot COVID-19 Patient List | NammaBagalkot</title>
+         <meta name="description" content="Bagalkot District COVID-19 patients analysis, patient list, active patients, recovered patients, deceased patiemts">
+         <meta name="author" content="Amrut Deshpande">
+      <!-- Mobile Specific Metas
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- FONT
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+         <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600&display=swap" rel="stylesheet" type="text/css">
+      <!-- CSS
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+         <link rel="stylesheet" href="css/normalize.css">
+         <link rel="stylesheet" href="css/skeleton.css">
+         <link rel="stylesheet" href="css/style.css?0705">
+         <script src="js/jquery.min.js"></script>
+         <script src="js/sortable.js"></script>
+         <!-- Global site tag (gtag.js) - Google Analytics -->
+         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-24636577-6"></script>
+         <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-24636577-6');
+         </script>
+
+      <!-- Favicon
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+
+      </head>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+
+      <!-- Include Handlebars from a CDN -->
+      <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+      <body>
+         <div>
+            <a href="index.html" target="_new"><img  style="display:block;margin:0px auto;"  src='nblogo.jpg'></a>
+            <h1 style="text-align:center;margin-top: 1rem;font-size: 1.9rem;">Covid-19 Bagalkot | <span><a href="index.html">Dashboard</a></span> | <span><a href="analysis.html">Analysis</a></h1>
+            </div>
+            <div class="container">
+               <hr/>
+               <div class="row stats-wrapper">
+                  <div class="box" style="color:red">
+                     <h4><span class="stats-number" id="bgkCount">-</span><span class="stats-increment" id="bgkCount-rise"></span></h4>
+                     <p>Positive</p>
+                  </div>
+                  <div class="box" style="color:blue">
+                     <h4 class="stats-number" id="activeCount">-</h4>
+                     <p>Active</p>
+                  </div>
+                  <div class="box" style="color:#039c03">
+                     <h4 class="stats-number" id="recoveredCount">-</h4>
+                     <p>Recovered</p>
+                  </div>
+                  <div class="box" style="color:gray">
+                     <h4 class="stats-number" id="deathCount">-</h4>
+                     <p>Deaths</p>
+                  </div>
+
+               </div>
+               <hr/>
+               <div id="patient-table">
+                 <h5 class="center">Covid-19 Patient List | <span><a href="visualize.html"> Visualize</a></span></h5>
+                 <div class="center"><input type="text" id="search"  placeholder="Search List"></div>
+                 <p class="center" id="matching-results-count"></p>
+                 <script id="patient-template" type="text/x-handlebars-template">
+
+
+
+                    <div class="table-wrapper">
+                       <table id="patient-list-table" class="sortable">
+                          <tr><td>Patient Id</td><td>Published Date</td><td>Place</td><td>Age</td><td>Gender</td><td>Status</td><td>Source</td><td>Comments</td></tr>
+                          {{#each patients}}
+                          <tr><td>{{this.pid}}</td><td>{{this.date}}</td><td>{{this.place}}</td><td>{{this.age}}</td><td>{{this.gender}}</td><td>{{this.status}}</td><td><a href="{{this.source}}">link</a></td><td>{{this.comments}}</td></tr>
+
+                          {{/each}}
+                       </table>
+                    </div>
+                 </script>
+
+                 <div  class="patients" id="patients">
+                 </div>
+
+                 <script>
+
+                   var graphDataUrl  ="https://covid19.nammabagalkot.in/getJson.php?f=graph";
+                   $.get(graphDataUrl,function(graphData){
+			//drawGraph(graphData);
+			printPatients(graphData)
+		});
+                   function printPatients(data){ 
+                      var source = document.getElementById("patient-template").innerHTML;
+                      var template = Handlebars.compile(source);
+
+                      /** Recovered Count Calculation */
+                      const statusArray = data.nodes;
+                      var statusProperty = "status";
+                      const countByStatus = _.groupBy(statusArray, statusProperty);
+                      $("#bgkCount").html(data.nodes.length);
+                      $("#recoveredCount").html(countByStatus['Recovered'].length);
+                      $("#activeCount").html(data.nodes.length-(countByStatus['Recovered'].length+countByStatus['Deceased'].length));
+                      $("#deathCount").html(countByStatus['Deceased'].length);
+                      /* End */
+
+                      /* Calculate Today's rise */
+                      var dateProperty = "date";
+                      const countByDate = _.groupBy(statusArray, dateProperty);
+                      var ar = Object.keys(countByDate);
+                      ar.sort(function(a,b){
+		// Turn your strings into dates, and then subtract them
+		// to get a value that is either negative, positive, or zero.
+		
+		var dateParts1 = a.split("/");
+				// month is 0-based, that's why we need dataParts[1] - 1
+				var dateObject1 = new Date(+dateParts1[2], dateParts1[1] - 1, +dateParts1[0]); 
+				
+				var dateParts2 = b.split("/");
+				// month is 0-based, that's why we need dataParts[1] - 1
+				var dateObject2 = new Date(+dateParts2[2], dateParts2[1] - 1, +dateParts2[0]); 
+            return dateObject1.getTime() - dateObject2.getTime()
+         });
+                      var today = new Date();
+                      var todaysConfirmedCases =0;
+                      if(ar[ar.length-1].split("/")[0]==today.getDate()){
+                        todaysConfirmedCases = countByDate[ar[ar.length-1]].length;
+                     }
+                     $("#bgkCount-rise").html(" (+"+todaysConfirmedCases+")");
+                     /* end */
+
+
+                     data.nodes.reverse();
+                     var context = {patients:data.nodes};
+                     var html = template(context);
+                     $("#patients").html(html);
+                     var newTableObject = document.getElementById("patient-list-table");
+                  sorttable.makeSortable(newTableObject);
+   }
+</script>
+<script>
+   /* Table search*/
+            
+            $("#search").keyup(function () {
+              var value = this.value.toLowerCase().trim();
+              gtag('config', 'UA-24636577-6', {'page_path': 'searchPatients.php?q='+value});
+              $("#patient-list-table tr").each(function (index) {
+                if (!index) return;
+                $(this).find("td").each(function () {
+                  var id = $(this).text().toLowerCase().trim();
+                  var not_found = (id.indexOf(value) == -1);
+                  $(this).closest('tr').toggle(!not_found);
+                  return not_found;
+               });
+             });
+           });
+
+        </script>
+
+
+        <p class="footer center"><a href="mailto:amrutdeshpande7@gmail.com">Report incorrect data</a></p>
+        <!-- <script type="text/javascript" src="//ofgogoatan.com/apu.php?zoneid=3234318" async data-cfasync="false"></script> -->
+        <!-- <script src="https://pushsar.com/pfe/current/tag.min.js?z=3288918" data-cfasync="false" async></script> -->
+     </body>
+     </html>

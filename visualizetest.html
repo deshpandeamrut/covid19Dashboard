@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Covid19 Patient Linkages | Bagalkot</title>
+  <meta name="description" content="Bagalkot District covid-19 patient link visualization graph.">
+  <meta name="author" content="Amrut Deshpande">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <script src="js/jquery.min.js"></script>
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link rel="icon" type="image/png" href="images/nblogo.png"> -->
+<script data-ad-client="ca-pub-7389348172038480" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<style>
+.box{
+	text-align:center;
+}
+.credits{
+	color:gray;
+}
+.gstores{
+	display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+   // justify-content: center;
+    align-items: center;
+}
+.gstore{
+	min-width: 200px; 
+    max-width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 25px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+}
+.article-img{
+	//max-height:200px;
+	max-width:270px;
+	margin:-10px;
+}
+
+.articles{
+	display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    //align-items: center;
+}
+.article{
+	min-width: 200px; 
+    max-width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+}
+.article a{
+	text-decoration:none;
+	color:black;
+	font-weight:bold;
+}
+
+.table-wrapper{
+	overflow-x:scroll;
+	overflow:auto;
+}
+
+//wide devices
+@media (min-width: 740px) {
+	.article{
+	min-width: 200px; 
+    max-width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 25px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+	
+}
+
+	
+}
+/* Make element full width */
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+
+/* Make sure elements don't run outside containers (great for images in columns) */
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+
+/* Float either direction */
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+
+/* Clear a float */
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+  
+  /* TOOLTIP */
+div.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: #001;
+  color: #F00;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.d3-tip span {
+  color: #ff00c7;
+}
+</style>
+<style>
+			body{ font: calibri 12px; text-align: center;}
+
+			.link {
+			  stroke: #ccc;
+			}
+
+			.node text {
+			  pointer-events: none;
+			  font: sans-serif;
+			}
+			 
+	div.tooltip {
+    position: absolute;
+    background-color: white;
+    max-width; 200px;
+    height: auto;
+    padding: 1px;
+    border-style: solid;
+    border-radius: 4px;
+    border-width: 1px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
+    pointer-events: none;
+  }
+		</style>
+</head>
+<script type="text/javascript" src="https://d3js.org/d3.v3.js""></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<body>
+ <div>
+ <a href="index.php" target="_new"><img  style="display:block;margin:0px auto;"  src='nblogo.jpg'></a><h5 style="text-align:center;">Covid-19 Visualize | <span><a href="index.php">Dashboard</a></span></h5></div>
+
+<div class="container">
+</div>
+
+
+<script type="text/javascript">
+	//Set margins and sizes
+var margin = {
+    top: 20,
+    bottom: 20,
+    right: 0,
+    left: 0
+};
+var width = 760 - margin.left - margin.right;
+var height = 600 - margin.top - margin.bottom;
+//Load Color Scale
+var c10 = d3.scale.category10();
+//Create an SVG element and append it to the DOM
+var svgElement = d3.select(".container")
+    .append("svg") //.attr({"width": width+margin.left+margin.right, "height": height+margin.top+margin.bottom})
+    .attr("viewBox", '0 0 800 600')
+    .append("g")
+//.attr("transform","translate("+margin.left+","+margin.top+")");	
+//Load External Data
+
+var tooltip = d3.select(".container")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+
+
+d3.json("graph.json", function(dataset) {
+
+    var edges = [];
+    dataset.links.forEach(function(e) {
+        var sourceNode = dataset.nodes.filter(function(n) {
+                return n.id === e.source;
+            })[0],
+            targetNode = dataset.nodes.filter(function(n) {
+                return n.id === e.target;
+            })[0];
+
+        edges.push({
+            source: sourceNode,
+            target: targetNode,
+            weight: e.weight
+        });
+    });
+
+
+	
+
+    //Extract data from dataset
+    var nodes = dataset.nodes,
+        links = dataset.links;
+		
+		
+		
+	var tip = d3.tip().attr('class', 'd3-tip')
+    .html(function(d) {
+        var x = links.filter(g => g.source.name == d.name).map(t => t.target.name).toString();
+        var y = links.filter(g => g.target.name == d.name).map(t => t.target.name).toString();
+        return "<span>" + "inbound: " + x + "</span><br><span>" + "outbound: " + y + "</span>";
+    });
+
+svgElement.call(tip);	
+    //Create Force Layout
+    var force = d3.layout.force()
+        .size([width, height])
+        .nodes(nodes)
+        .links(edges)
+        .gravity(0.05)
+        .charge(-200)
+        .linkDistance(200);
+    //Add links to SVG
+    var link = svgElement.selectAll(".link")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("stroke-width", function(d) {
+            return d.weight / 10;
+        })
+        .attr("class", "link");
+    //Add nodes to SVG
+    var node = svgElement.selectAll(".node")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("class", "node")
+        .call(force.drag);
+    //Add labels to each node
+    var label = node.append("text")
+        .attr("dx", 12)
+        .attr("dy", "0.35em")
+        //.attr("font-size", function(d){ return d.influence*1.5>9? d.influence*1.5: 9; })
+        .text(function(d) {
+            return d.pid;
+        });
+    //Add circles to each node
+    var circle = node.append("circle")
+        .attr("r", function(d) {
+            return d.influence / 2 > 5 ? d.influence / 2 : 5;
+        })
+        .attr("fill", function(d) {
+            return c10(d.zone * 10);
+        });
+
+    //node.on("mouseover", tip.show).on("mouseout", tip.hide).on("dblclick", pin);
+    
+		
+		
+		node.on('mouseover.tooltip', function(d) {
+      	tooltip.transition()
+        	.duration(300)
+        	.style("opacity", .8);
+      	tooltip.html("Patient Id:" + d.pid + "<p/>" + d.place+"<br/>" +d.comments)
+        	.style("left", (d3.event.pageX -150) + "px")
+        	.style("top", (d3.event.pageY - 150) + "px");
+    	}).on("mouseout", hideToolTip).on("dblclick", hideToolTip);
+	
+
+		node.on('touch', function(d) {
+      	tooltip.transition()
+        	.duration(300)
+        	.style("opacity", .8);
+      	tooltip.html("Patient Id:" + d.pid + "<p/>" + d.place+"<br/>" +d.comments)
+        	.style("left", (d3.event.pageX -150) + "px")
+        	.style("top", (d3.event.pageY - 150) + "px");
+    	});
+
+
+    //This function will be executed for every tick of force layout 
+    force.on("tick", function() {
+        //Set X and Y of node
+        node.attr("r", function(d) {
+                return d.influence;
+            })
+            .attr("cx", function(d) {
+                return d.x;
+            })
+            .attr("cy", function(d) {
+                return d.y;
+            });
+        //Set X, Y of link
+        link.attr("x1", function(d) {
+            return d.source.x;
+        })
+        link.attr("y1", function(d) {
+            return d.source.y;
+        })
+        link.attr("x2", function(d) {
+            return d.target.x;
+        })
+        link.attr("y2", function(d) {
+            return d.target.y;
+        });
+        //Shift node a little
+        node.attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        });
+    });
+    //Start the force layout calculation
+    force.start();
+});
+
+function hideToolTip(d) {
+   tooltip.transition()
+        	.duration(300);
+        	//.style("opacity", 0);
+}
+
+//window.addEventListener('resize', resize); 
+/*
+function resize() {
+    var width = window.innerWidth, height = window.innerHeight;
+   // svg.attr("width", width).attr("height", height);
+    force.size([width, height]).resume();
+}*/
+</script>
+ <script async src="https://www.googletagmanager.com/gtag/js?id=UA-24636577-2"></script>
+ <!-- Include Handlebars from a CDN -->
+<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+	
+</body>
+</html>
+
+
+

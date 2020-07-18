@@ -1,0 +1,212 @@
+{
+    "nodes": [
+        {
+            "id": 0,
+            "pid": "P125",
+            "influence": 25,
+            "zone": 0,
+            "date": "03\/04\/2020",
+            "gender": "M",
+            "source": "https:\/\/twitter.com\/ANI\/status\/1245973223600259072",
+            "age": "76",
+            "status": "Deceased",
+            "place": "Bagalkot",
+            "comments": "Brother of P162"
+        },
+        {
+            "id": 1,
+            "pid": "P161",
+            "influence": 20,
+            "zone": 0,
+            "date": "06\/04\/2020",
+            "gender": "F",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247084414669971457",
+            "age": "54",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Wife of P125"
+        },
+        {
+            "id": 2,
+            "pid": "P162",
+            "influence": 30,
+            "zone": 0,
+            "date": "06\/04\/2020",
+            "gender": "M",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247084414669971457",
+            "age": "58",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Travel history to Kalburagi"
+        },
+        {
+            "id": 4,
+            "pid": "P165",
+            "influence": 16,
+            "zone": 0,
+            "date": "07\/04\/2020",
+            "gender": "F",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247429517305458689",
+            "age": "41",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Neigbour of P125"
+        },
+        {
+            "id": 3,
+            "pid": "P164",
+            "influence": "2",
+            "zone": "1",
+            "age": "33",
+            "gender": "M",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247429517305458689",
+            "place": "Mudhol,Bagalkot",
+            "comments": "Attended Jammat Delhi Meet",
+            "date": "07\/04\/2020",
+            "status": "Isolated in Dt Hosp"
+        },
+        {
+            "id": 5,
+            "pid": "P186",
+            "influence": 2,
+            "zone": 0,
+            "date": "09\/04\/2020",
+            "gender": "M",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247429517305458689",
+            "age": "4",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Neigbour of P125 and Came in contact with P165 (son)"
+        },
+        {
+            "id": 6,
+            "pid": "P187",
+            "influence": 2,
+            "zone": 0,
+            "date": "09\/04\/2020",
+            "gender": "M",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247429517305458689",
+            "age": "13",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Neigbour of P125 and Came in contact with P165 (son of broher-in-law)"
+        },
+        {
+            "id": 7,
+            "pid": "P188",
+            "influence": 2,
+            "zone": 0,
+            "date": "09\/04\/2020",
+            "gender": "F",
+            "source": "https:\/\/twitter.com\/nammabagalkot\/status\/1247429517305458689",
+            "age": "9",
+            "status": "Isolated in Dt Hosp",
+            "place": "Bagalkot",
+            "comments": "Neigbour of P125 and Came in contact with P165 (daughter of brother-in-law)"
+        },
+        {
+            "id": 8,
+            "pid": "P240",
+            "influence": "10",
+            "zone": "1",
+            "age": "27",
+            "gender": "M",
+            "status": "Isolated in Dt Hosp",
+            "date": "13\/04\/2020",
+            "source": "TWITTER.COM",
+            "place": "Mudhol",
+            "comments": "Contact of P164"
+        },
+        {
+            "id": 9,
+            "pid": "P248",
+            "influence": "10",
+            "zone": "0",
+            "age": "43",
+            "gender": "M",
+            "status": "Isolated in Dt Hosp",
+            "date": "14\/04\/2020",
+            "source": "https:\/\/twitter.com\/sriramulubjp\/status\/1249961474304249856\/photo\/1",
+            "place": "Bagalkot",
+            "comments": "Contact of P186 & P165"
+        },
+        {
+            "id": 10,
+            "pid": "P249",
+            "influence": "10",
+            "zone": "0",
+            "age": "32",
+            "gender": "F",
+            "status": "Isolated in Dt Hosp",
+            "date": "14\/04\/2020",
+            "source": "https:\/\/twitter.com\/sriramulubjp\/status\/1249961474304249856\/photo\/1",
+            "place": "Bagalkot",
+            "comments": "Contact of P186 & P165"
+        },
+        {
+            "id": 11,
+            "pid": "P251",
+            "influence": "10",
+            "zone": "0",
+            "age": "39",
+            "gender": "F",
+            "status": "Isolated in Dt Hosp",
+            "date": "14\/04\/2020",
+            "source": "https:\/\/twitter.com\/sriramulubjp\/status\/1249961474304249856\/photo\/1",
+            "place": "Bagalkot",
+            "comments": "Contact of P125 (neihbour)"
+        }
+    ],
+    "links": [
+        {
+            "source": 2,
+            "target": 0,
+            "weight": 6
+        },
+        {
+            "source": 0,
+            "target": 1,
+            "weight": 4
+        },
+        {
+            "source": 1,
+            "target": 4,
+            "weight": 12
+        },
+        {
+            "source": 4,
+            "target": 5,
+            "weight": 2
+        },
+        {
+            "source": 4,
+            "target": 6,
+            "weight": 2
+        },
+        {
+            "source": 4,
+            "target": 7,
+            "weight": 2
+        },
+        {
+            "source": 3,
+            "target": 8,
+            "weight": 5
+        },
+        {
+            "source": 0,
+            "target": 11,
+            "weight": 15
+        },
+        {
+            "source": 4,
+            "target": 9,
+            "weight": 20
+        },
+        {
+            "source": 4,
+            "target": 10,
+            "weight": 20
+        }
+    ]
+}

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <!-- Basic Page Needs
+      	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      	<meta charset="utf-8">
+      	<title>Bagalkot COVID-19 Patient Analysis | NammaBagalkot</title>
+      	<meta name="description" content="Bagalkot District COVID-19 patients analysis, Male vs Female infections graph, Bagalkot taluka wise spread,Bagalkot daily COVID-19 trend,Karnataka Testing Trends">
+      	<meta name="author" content="Amrut Deshpande">
+      <!-- Mobile Specific Metas
+      	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      	<meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- FONT
+      	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600&display=swap" rel="stylesheet" type="text/css">
+      <!-- CSS
+      	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      	<link rel="stylesheet" href="css/normalize.css">
+      	<link rel="stylesheet" href="css/skeleton.css">
+      	<script src="js/jquery.min.js"></script>
+      	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js""></script>
+      	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+      	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
+      	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+      	<script src="js/sortable.js"></script>
+      	<style>
+      		.column-wrapper{
+      			margin: 20px 0px;
+      			width: 100%;
+      			max-width: 450px;
+      		}
+      		body{ 
+      			font: calibri 12px; 
+      			text-align: center;
+      		}
+      		.fact-box{
+      			border: 1px solid #ededed;
+      			padding: 1%;
+      			margin: 3%;
+      			box-shadow: 0px 1px 2px 1px lightgrey;
+      		}
+
+      		
+      		.number{
+      			font-size: 5rem;
+      		}
+      		.flex-container{
+      			display: flex;
+      			justify-content: center;
+      			flex-wrap: wrap;
+      			align-content: space-between;
+      		}
+      		.analysis-wrapper{
+      			display: flex;
+      			flex-wrap: wrap;
+      			justify-content: center;
+      			align-items: center;
+      			align-content: center;
+      			margin-top:5%;
+      		}
+      		.taulka-wise-breakup{
+      			width:95%;
+      			overflow-x: auto;
+
+      		}
+      		@media (min-width: 500px) {
+      			.container{
+      				width:90%;
+      			}
+      			.fact-box{
+      				width:25%;
+      			}
+      			.column-wrapper{
+      				margin:10px;
+      			}
+      		}
+
+      	}
+      	
+      </style>
+
+  </head>
+  
+  <body>
+  	<div>
+  		<a href="index.html" target="_new"><img  style="display:block;margin:0px auto;"  src='nblogo.jpg'></a>
+  		<h1 style="text-align:center;margin-top: 1rem;font-size: 1.9rem;">Covid-19 Analysis | <span><a href="index.html">Dashboard</a></span> | <span><a href="visualize.html">Visualize</a></h1>
+  		</div>
+  		<div class="container">
+  			<hr/>
+  			<div class="flex-container">
+  				<!-- <div id="confirmed-rate" class="fact-box" style="background:#ffcccc80; ">
+  				</div> -->
+  				<div id="recovery-rate" class="fact-box" style="background:#c2eebf80; ">
+  				</div>
+  				<div id="recovery-days" class="fact-box" style="background:#c2eebf80; ">
+  				</div>
+  				<div id="recovery-predictions" class="fact-box" style="background:#c2eebf80; ">
+  				</div>
+  				<!-- <div id="mortality-rate" class="fact-box" style="background:#ffcccc80; ">
+  				</div>
+  				<div id="growth-rate" class="">
+  				</div> -->
+  			</div>
+  			<div class="row row-wrapper analysis-wrapper">
+  				Taluka Wise Breakup
+  				<div  class="taulka-wise-breakup" id="taluka-stats">
+  				</div>
+  				<div class="column-wrapper">
+  					Positive Cases Trend 
+  					<canvas id="DAILY" width="400" height="400"></canvas>
+  				</div>
+  				<div class="column-wrapper">
+  					Travel History vs Non Travel Infections
+  					<canvas id="TRAVEL" width="400" height="400"></canvas>
+  				</div>
+
+  				<div class="column-wrapper">
+  					Taluka Wise Spread
+  					<canvas id="TALUKA" width="400" height="400"></canvas>
+  				</div>
+
+  				<div class="columns column-wrapper">
+  					Active vs Deceased vs Recovered
+  					<canvas id="STATUS" width="400" height="400"></canvas>
+  				</div>
+  				<div class="column-wrapper">
+  					Distribution based on Gender
+  					<canvas id="GENDER" width="400" height="400"></canvas>
+  				</div>
+  				<div class="column-wrapper">
+  					Age wise Distribution
+  					<canvas id="AGE" width="400" height="400"></canvas>
+  				</div>
+  				<div class="column-wrapper">
+  					Testing Count Comparison among states
+  					<canvas id="STATES-TETSING" width="400" height="500"></canvas>
+  				</div>
+
+
+  				<div class="column-wrapper">
+  					Testing Count vs COVID-19 Positives Trend in Karnataka
+  					<canvas id="KA-TESTING" width="500" height="500"></canvas>
+  				</div>
+
+  			</div>
+
+  			<!-- <script id="taluka-stats-template" type="text/x-handlebars-template">
+
+  				<div id="taluka-stats-table" class="table-wrapper sortable">
+  					<table id="stats-table">
+  						<thead>
+  							<tr><th>Taluka</th><th>Conf</th><th>Act</th><th>Rec</th><th>Dec</th></tr>
+  						</thead>
+
+  						{{#each talukas}}
+  						<tr><td>{{this.place}}</td><td>{{this.confirmed}}</td><td>{{this.active}}</td><td>{{this.recovered}}</td><td>{{this.deceased}}</td></tr>
+  					</div>
+  					{{/each}}
+  				</table>
+  			</div>
+  			<p class="center"><a href="patients.html">View all Patients</a></p>
+  		</script> -->
+
+  	</div>
+  	<script>
+  		$(document).ready(function(){
+
+  			var analysisUrl1  ="https://covid19.nammabagalkot.in/getJson.php?f=graph";
+  			var analysisUrl  ="https://covid19.nammabagalkot.in/getJson.php?f=data/statsData";
+  			var testDataUrl = "https://api.covid19india.org/state_test_data.json";
+  			var d = new Date();
+  			d.setMinutes(d.getMinutes() - 10);                 
+  			var storageDate = localStorage.getItem("storedAtAnalysis");
+  			var sDate = new Date(storageDate);
+			if(sDate  !== null && d.getTime()<sDate.getTime()){//if not expired
+				drawGraphs(JSON.parse(localStorage.getItem("graphData")));
+				drawTetsingGraphs(JSON.parse(localStorage.getItem("testingData")));
+				calculateFacts(JSON.parse(localStorage.getItem("statsData")));
+				getTalukaWiseStats(JSON.parse(localStorage.getItem("graphData")));
+			}else{
+				$.get(analysisUrl1,function(graphData){
+
+					localStorage.setItem("graphData",JSON.stringify(graphData));
+					drawGraphs(graphData);
+					getTalukaWiseStats(graphData);
+				});
+				$.get(testDataUrl,function(graphData){
+					drawTetsingGraphs(graphData);
+					localStorage.setItem("testingData",JSON.stringify(graphData));
+				});
+				$.get(analysisUrl,function(statsData){
+					calculateFacts(statsData);
+					localStorage.setItem("statsData",JSON.stringify(statsData));
+				});
+				localStorage.setItem("storedAtAnalysis",new Date());
+			}
+
+function calculateFacts(statsData){
+		//statsData= JSON.parse(statsData);
+
+		var confirmedRate = (statsData.stats.positive/statsData.stats.totalTests)*1000;
+		var confirmedRateText = "<h5 style='color:#e03838;'>Positivity Rate <br/><span class='number'>" + parseInt(confirmedRate) + "</span> out of every 1000 people tested have tested positive in Bagalkot</h5>";
+		
+		
+		$("#confirmed-rate").html(confirmedRateText);
+		
+		/*
+		var mortalityRate = (statsData.stats.death/statsData.stats.positive)*100;
+		var mortalityRateText = "<h5 style='color:#e03838;'>Mortality Rate <br/><span class='number'>" + parseInt(mortalityRate) + "</span> out of every 1000 people tested have tested positive in Bagalkot</h5>";
+		console.log(mortalityRateText);
+		$("#mortality-rate").html(mortalityRateText);
+		*/
+
+}
+
+function calculateRecoverDays(graphData)
+{
+	const dailyArray = graphData.nodes;
+	const grpByProperty = "status";
+	const countByStatus = _.groupBy(dailyArray, grpByProperty);
+	var rDays=0;
+	var sum=0;
+	$.each(countByStatus['Recovered'], function(key,value) {
+		var publishedDate = value.date.split("/");
+		var publishedDate = new Date(+publishedDate[2], publishedDate[1] - 1, +publishedDate[0]); 
+
+		var recoveredDate = value.recoveryDate.split("/");
+		var recoveredDate = new Date(+recoveredDate[2], recoveredDate[1] - 1, +recoveredDate[0]); 
+
+		const diffTime = Math.abs(recoveredDate - publishedDate);
+		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+		sum = sum+diffDays;
+
+	}); 
+	var rDays = Math.ceil(sum/countByStatus['Recovered'].length);
+
+	var recoveryRate = (countByStatus['Recovered'].length/graphData.nodes.length)*100;
+	var recoveryData = {};
+	recoveryData.rate = recoveryRate;
+	recoveryData.days = rDays;
+
+	printRecoveryData(recoveryData);
+	predictDiscahrges(recoveryData,graphData);
+}
+function predictDiscahrges(recoveryData,graphData){
+	var today = new Date();
+	var predictedPatientDisscharges= [];
+	$.each(graphData.nodes, function(key,value) {
+		if(value.status.toLowerCase() !="recovered" && value.status.toLowerCase() !="deceased"){
+			var publishedDate = value.date.split("/");
+			var publishedDate = new Date(+publishedDate[2], publishedDate[1] - 1, + publishedDate[0]); 
+
+
+			const diffTime = Math.abs(today - publishedDate);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+			if((recoveryData.days-diffDays)<2){
+				predictedPatientDisscharges.push(value.pid);
+			}
+		}
+
+	}); 
+	if(predictedPatientDisscharges.length>0){
+		var recoverPredictionText ="<h5 style='color:#68bd2f;'>Our Prediction algorithm says <br/><span class=''>"  + predictedPatientDisscharges.toString() + "</span> would be discharged in a day or two.</h5>";
+	}
+	$("#recovery-predictions").html(recoverPredictionText);
+}
+function printRecoveryData(recoveryData){
+
+	var recoveryRateText = "<h5 style='color:#68bd2f;'>Recovery Rate <br/><span class='number'>" + parseInt(recoveryData.rate) + "</span> out of every 100 people affected with COVID-19 have recovered in Bagalkot i.e " + parseInt(recoveryData.rate) +"% </h5>";
+	$("#recovery-rate").html(recoveryRateText);
+
+	var recoveryDaysText = "<h5 style='color:#68bd2f;'>Average Recovery Time <br/><span class='number'>" + recoveryData.days  + "</span> days is usually what it has taken for a COVID-19 positive patient to recover in Bagalkot.</h5>";
+	$("#recovery-days").html(recoveryDaysText);
+}
+
+function getTalukaWiseStats(graphData){
+	const talukaArray = graphData.nodes;
+	talukaProperty = "place";
+	const countByTaluka = _.groupBy(talukaArray, talukaProperty);
+	var taluka = {};
+	var talukaCount = [];
+	var talukas = {};
+	$.each(countByTaluka, function(key,value) {
+		if(key.toLowerCase().includes("bag")){
+			key  = "Bagalkot";
+		}
+		else if(key.toLowerCase().includes("jam")){
+			key  = "Jamkhandi";
+		}
+		
+		else if(key.toLowerCase().includes("mud")){
+			key  = "Mudhol";
+		}
+		if(key in talukas){
+			var tmp = talukas[key];
+			tmp.push(value);
+			talukas[key] = tmp;
+		}else{
+			talukas[key] = value;
+		}
+	}); 
+	var tals = [];
+	$.each(talukas, function(key,value) {
+		var statusArray = value;
+		var statusProperty = "status";
+		var countByStatus = _.groupBy(statusArray, statusProperty);
+		var tal ={'recovered':0,'confirmed':0,'deceased':0};
+
+		if('Deceased' in countByStatus)
+		{
+			tal.deceased=countByStatus['Deceased'].length;
+		}
+		if('Recovered' in countByStatus)
+		{
+			tal.recovered=countByStatus['Recovered'].length;
+		}
+		tal.active=value.length-(tal.recovered+tal.deceased);
+		tal.confirmed = value.length;
+		tal.place = value[0].place;
+		tals.push(tal);
+	});
+
+	var source = document.getElementById("taluka-stats-template").innerHTML;
+	var template = Handlebars.compile(source);
+	var context = {talukas:tals};
+	var html = template(context);
+	$("#taluka-stats").html(html);
+	newTableObject = document.getElementById("stats-table");
+	sorttable.makeSortable(newTableObject);
+}
+function drawGraphs(graphData){
+	/* STATUS GRAPH */	
+	const Array = graphData.nodes;
+	var Property = "status";
+	var patientsByStatus = _.groupBy(Array, Property);
+	var status = {'Active':0,'Deceased':0,'Recovered':0};
+	var statusCount = [];
+	$.each(patientsByStatus, function(key,value) {
+		if(key.includes("Hosp") || key.includes("Isolated"))
+		{
+			key = "Active";
+		}
+		status[key] = status[key] + value.length; 
+	}); 
+	var statusColors = ["#33498db","#2ca25f","#f03b20"];
+	var statusCtx = document.getElementById('STATUS').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var statusConfig = {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(status),
+				datasets: [{
+					data: Object.values(status),
+				 //backgroundColor: statusColors,
+				}]
+			},
+			options: {
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.RdPu3'
+					}
+				}
+			}
+		};
+
+		calculateRecoverDays(graphData);
+		var chart = new Chart(statusCtx, statusConfig);
+		/* END STATUS GRAPH*/
+		
+		
+		/* GENDER GRAPH */	
+		const genderArray = graphData.nodes;
+		Property = "gender";
+		const patientsByGender = _.groupBy(genderArray, Property);
+		var gender = [];
+		var genderCount = [];
+		var genderColors = [""];
+		$.each(patientsByGender, function(key,value) {
+			gender.push(key);
+			genderCount.push(value.length);
+			if(key.includes("Fe")){
+				genderColors.push("#e13af2");
+			}else{
+				genderColors.push("#815cc5");
+			}
+		}); 
+
+
+		var ctx = document.getElementById('GENDER').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'pie',
+			data: {
+				labels: gender,
+				datasets: [{
+					data: genderCount,
+				 //backgroundColor: genderColors,
+				}]
+			},
+			options: {
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.PiYG4'
+					}
+				}
+			}
+		};
+
+		var chart = new Chart(ctx, config);
+		/* END GENDER GRAPH*/
+		
+
+		/* DAILY GRAPH */
+		const dailyArray = graphData.nodes;
+		const grpByProperty = "date";
+		const countByDay = _.groupBy(dailyArray, grpByProperty);
+		var dates = [];
+		var dateCount = [];
+		$.each(countByDay, function(key,value) {
+			var dateParts = key.split("/");
+	// month is 0-based, that's why we need dataParts[1] - 1
+	var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+	dates.push(dateObject);
+	dateCount.push(value.length);
+}); 
+		var today = new Date();
+		if(!dates.includes(today)){
+			dates.push(today);
+
+		}
+
+		var ctx = document.getElementById('DAILY').getContext('2d');
+		var config = {
+			type: 'bar',
+			data: {
+				labels: dates,
+				datasets: [{
+					label: 'Postive Cases Trend',
+					data: dateCount,
+				// backgroundColor: 
+				borderColor: ["#c45850"],
+			}]
+		},
+
+		options: {
+			scales: {
+				xAxes: [{
+					type: 'time',
+					distribution: 'linear'
+				}],
+				yAxes: [{
+					ticks: {
+						beginAtZero: true
+					}
+				}]
+			},
+			plugins: {
+				colorschemes: {
+					scheme: 'brewer.SetTwo5'
+				}
+			}
+		}
+	};
+
+	var chart = new Chart(ctx, config);
+	/* End Daily Trend*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/* TRAVEL HISTORY GRAPH */
+		var patientsArray = graphData.nodes;
+		var travelHistoryCount =0;
+		$.each(patientsArray, function(key,value) {
+			console.log(value.comments);
+			if(value.comments.toLowerCase().includes("travel") || value.comments.toLowerCase().includes("returnee")){
+				travelHistoryCount++;
+			}
+		});
+		console.log(travelHistoryCount);
+		var ctx = document.getElementById('TRAVEL').getContext('2d');
+	
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'pie',
+			data: {
+				labels: ["Travel History","Non Travel History"],
+				datasets: [{
+					data: [travelHistoryCount,patientsArray.length-travelHistoryCount]
+				 //backgroundColor: talukaColors,
+				}]
+			},
+			options: {
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.SetTwo5'
+					}
+				}
+			}
+		};
+		var chart = new Chart(ctx, config);
+	/* End TRAVEL HISTORY Trend*/
+
+
+
+
+
+
+
+
+	/* TALUKA WISE GRAPH */	
+	const talukaArray = graphData.nodes;
+	talukaProperty = "place";
+	const countByTaluka = _.groupBy(talukaArray, talukaProperty);
+	var taluka = {};
+	var talukaCount = [];
+	var talukaColors = ["#7e3bec", "#6f3875", "#e13af2", "#ef9d15", "#09d93c", "#e13af2", "#f7befb", "#cef1d7", "#09780a"];
+	$.each(countByTaluka, function(key,value) {
+		if(key.toLowerCase().includes("bag")){
+			key  = "Bagalkot";
+		}
+		else if(key.toLowerCase().includes("jam")){
+			key  = "Jamkhandi";
+		}
+		
+		else if(key.toLowerCase().includes("mud")){
+			key  = "Mudhol";
+		}
+		if(key in taluka){
+			taluka[key] = taluka [key] + value.length;
+		}else{
+			taluka[key] = value.length;
+		}
+	}); 
+	var ctx = document.getElementById('TALUKA').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'pie',
+			data: {
+				labels: Object.keys(taluka),
+				datasets: [{
+					data: Object.values(taluka),
+				 //backgroundColor: talukaColors,
+				}]
+			},
+			options: {
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.SetTwo5'
+					}
+				}
+			}
+		};
+
+		var chart = new Chart(ctx, config);
+		/* END TALUKA WISE GRAPH*/
+
+
+
+		/* Age WISE GRAPH */	
+		const ageArray = graphData.nodes;
+		ageProperty = "age";
+		const countByAge = _.groupBy(ageArray, ageProperty);
+		var age = [];
+		var ageMap = {
+			"1-10":0,
+			"11-20":0,
+			"21-30":0,
+			"31-40":0,
+			"41-50":0,
+			"51-60":0,
+			"61-70":0,
+			"71-80":0,
+			"81-120":0,
+		};
+
+	//var talukaColors = ["#7e3bec", "#6f3875", "#e13af2", "#ef9d15", "#09d93c", "#e13af2", "#f7befb", "#cef1d7", "#09780a"];
+	$.each(countByAge, function(key,value) {
+		if(key<=10){
+			ageMap["1-10"]=ageMap["1-10"]+ value.length; 
+		}else if(key<=20){
+			ageMap["11-20"]=ageMap["11-20"]+ value.length;;
+		}else if(key<=30){
+			ageMap["21-30"]=ageMap["21-30"]+ value.length;;
+		}else if(key<=40){
+			ageMap["31-40"]=ageMap["31-40"]+ value.length;;
+		}else if(key<=50){
+			ageMap["41-50"]=ageMap["41-50"]+ value.length;;
+		}else if(key<=60){
+			ageMap["51-60"]=ageMap["51-60"]+ value.length;;
+		}else if(key<=70){
+			ageMap["61-70"]=ageMap["61-70"]+ value.length;;
+		}else if(key<=80){
+			ageMap["71-80"]=ageMap["71-80"]+ value.length;;
+		}else if(key<=120){
+			ageMap["81-120"]=ageMap["81-120"]+ value.length;;
+		}
+	}); 
+
+	var ctx = document.getElementById('AGE').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'bar',
+			data: {
+				labels: Object.keys(ageMap),
+				datasets: [{
+					label: 'Postive Cases Across age groups',
+					data: Object.values(ageMap),
+				 //backgroundColor: talukaColors,
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				},
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.SetTwo5'
+					}
+				}
+			}
+		};
+
+		var chart = new Chart(ctx, config);
+		/* END Age WISE GRAPH*/
+
+	}
+
+	function drawTetsingGraphs(graphData){
+
+		/* STATES TESTING GRAPH */	
+		var limit = 135000;
+		const stateArray = graphData.states_tested_data;
+		var stateProperty = "state";
+		var countByStates = _.groupBy(stateArray, stateProperty);
+		var states = [];
+		var statesCount = [];
+		var dates = [];
+		$.each(countByStates, function(key,value) {
+			var cnt = value[value.length-1].totaltested;
+			var dateKey = value[value.length-1].updatedon;
+			if(cnt==""){
+				cnt = value[value.length-2].totaltested;
+				dateKey = value[value.length-2].updatedon;
+				if(cnt==""){
+					cnt = value[value.length-3].totaltested;
+					dateKey = value[value.length-3].updatedon;
+				}
+			}
+			if(cnt<limit){
+
+			}else{
+				states.push(key+" ("+ dateKey +")");
+				statesCount.push(cnt);
+			}
+		}); 
+		var ctx = document.getElementById('STATES-TETSING').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'bar',
+			data: {
+				labels: states,
+				datasets: [{
+					label: 'Number of samples tested ('+limit+' and above)',
+					data: statesCount,
+				 //backgroundColor: talukaColors,
+
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				},
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.SetTwo5'
+					}
+				}
+			}
+		};
+
+		var chart = new Chart(ctx, config);
+
+
+
+		/* KA TESTING TREND */
+
+
+
+		/* STATES TESTING GRAPH */	
+
+		var KA ={};
+		var KaPos ={};
+		$.each(countByStates, function(key,value) {
+			$.each (value,function(k,daywise){
+				var dateParts = daywise.updatedon.split("/");
+				var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+				if(key=="Karnataka"){
+					obj = 
+					KA[dateObject] = daywise.totaltested;
+					KaPos[dateObject] = daywise.positive;
+				}
+			});
+		}); 
+
+
+		var ctx = document.getElementById('KA-TESTING').getContext('2d');
+		//var ctx = canvas.getContext('2d');
+		var config = {
+			type: 'line',
+			data: {
+				labels: Object.keys(KA),
+				datasets: [{
+					label: 'Karnataka Tetsing Count',
+					data: Object.values(KA)
+				 //backgroundColor: talukaColors,
+
+				},{
+					label: 'Karnataka Postive Cases Count',
+					data: Object.values(KaPos)
+				 //backgroundColor: talukaColors,
+
+				}]
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						type: 'time',
+						distribution: 'linear'
+					}],
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				},
+				plugins: {
+					colorschemes: {
+						scheme: 'brewer.SetTwo5'
+					}
+				}
+			}
+		};
+
+		var chart = new Chart(ctx, config);
+
+		/* END KA TEST TREND*/
+
+	}
+});
+
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-24636577-6"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'UA-24636577-6');
+</script>
+<p class="footer"><a href="mailto:amrutdeshpande7@gmail.com">Report incorrect data</a></p>
+
+</body>
+</html>

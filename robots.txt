@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: 
+Disallow: /cgi-bin/
+Disallow: /admin/
+Sitemap: https://covid19.nammabagalkot.in/sitemap.xml

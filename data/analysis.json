@@ -1,0 +1,78 @@
+{
+  "status": [
+    {
+      "name": "Active",
+      "count": 21,
+      "color": "#3498db"
+    },
+    {
+      "name": "Recovered",
+      "count": 0,
+      "color": "#2ca25f"
+    },
+    {
+      "name": "Deceased",
+      "count": 1,
+      "color": "#f03b20"
+    }
+  ],
+  "gender": [
+    {
+      "name": "Male",
+      "count": 15,
+      "color": "#815cc5"
+    },
+    {
+      "name": "Female",
+      "count": 7,
+      "color": "#e13af2"
+    }
+  ],
+  "taluka": [
+    {
+      "name": "Bagalkot",
+      "count": 14,
+      "color": "#7e3bec"
+    },
+    {
+      "name": "Badami",
+      "count": 0,
+      "color": "#6f3875"
+    },
+    {
+      "name": "Hunagunda",
+      "count": 0,
+      "color": "#e13af2"
+    },
+    {
+      "name": "Mudhol",
+      "count": 5,
+      "color": "#ef9d15"
+    },
+    {
+      "name": "Jamkhandi",
+      "count": 2,
+      "color": "#09d93c"
+    },
+    {
+      "name": "Bilgi",
+      "count": 0,
+      "color": "#e13af2"
+    },
+    {
+      "name": "Rabakavi",
+      "count": 0,
+      "color": "#f7befb"
+    },
+    {
+      "name": "Guledgudda",
+      "count": 0,
+      "color": "#cef1d7"
+    },
+    {
+      "name": "Banahatti",
+      "count": 0,
+      "color": "#09780a"
+    }
+  ]
+}

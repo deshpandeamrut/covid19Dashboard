@@ -1,0 +1,205 @@
+@font-face {
+  font-family: 'Pacifico';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Pacifico Regular'), local('Pacifico-Regular'), url(https://fonts.gstatic.com/s/pacifico/v12/FwZY7-Qmy14u9lezJ-6H6MmBp0u-.woff2) format('woff2');
+  font-display: swap;
+}
+
+.box{
+	text-align:center;
+	width:33%;
+}
+.credits{
+	color:gray;
+}
+.center{
+	text-align:center;
+}
+.gstores{
+	display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+   // justify-content: center;
+    align-items: center;
+	margin-bottom:5%;
+}
+.gstore{
+	min-width: 200px; 
+	height:200px;
+    max-width: 250px;
+	width:250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 25px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+	
+}
+.updates-wrapper{
+	display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+   // justify-content: center;
+    //align-items: center;
+	margin-bottom:5%;
+}
+.update{
+	min-width: 200px; 
+	//height:250px;
+    max-width: 250px;
+	width:250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 25px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+}
+.update img {
+	width:250px;
+}
+.update-title{
+	font-size:2rem;	
+}
+.date{
+	color: lightgray;
+    font-size: 12px;
+	margin:0px;
+}
+.update-description{
+	margin:0px;
+}
+.vh-center{
+	display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+.article-img{
+	//max-height:200px;
+	max-width:270px;
+	margin:-10px;
+}
+
+.articles{
+	display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    //align-items: center;
+}
+.article{
+	min-width: 200px; 
+    max-width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+}
+.article a{
+	text-decoration:none;
+	color:black;
+	font-weight:bold;
+}
+
+.patients{
+	//display: flex;
+    /* margin: 5px; */
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    //align-items: center;
+}
+.patient{
+	//min-width: 200px; 
+    //max-width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    //margin: 5px 5px;
+    /padding: 10px;
+    //box-shadow: 0px 0px 3px 0px #a49e9e5e;
+}
+.patient a{
+	/text-decoration:none;
+	color:black;
+	font-weight:bold;
+}
+
+.table-wrapper{
+	overflow-x:scroll;
+	overflow:auto;
+	
+}
+#q-table-wrapper{
+	display:none;
+}
+#toggle-q-list{
+	cursor:pointer;
+	
+}
+.stats-wrapper{
+	display:flex;
+	flex-wrap:wrap;
+	justify-content:center;
+}
+.stats-number{
+	font-size: 3.3rem;
+	margin-bottom: 0.3rem;
+}
+.stats-increment{
+	font-size: 1.8rem;
+}
+/* Larger than mobile */
+@media (min-width: 500px) {
+	.box{
+			width:auto;
+	}
+	.stats-wrapper{
+		justify-content:space-around;
+	}
+	
+}
+//wide devices
+@media (min-width: 740px) {
+	
+	.article{
+	min-width: 200px; 
+	width: 250px;
+    /* border: 1px solid #a49e9e5e; */
+    margin: 5px 25px;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px #a49e9e5e;
+	
+}
+
+	
+}
+/* Make element full width */
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+
+/* Make sure elements don't run outside containers (great for images in columns) */
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+
+/* Float either direction */
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+
+/* Clear a float */
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+@media all and (display-mode: standalone) {
+  body {
+    background-color: white;
+  }
+}
+
+

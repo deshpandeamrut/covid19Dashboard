@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <!-- Basic Page Needs
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <meta charset="utf-8">
+      <title>COVID-19 Patient Analysis | Bagalkot</title>
+      <meta name="description" content="Bagalkot District COVID-19 patients analysis, Male vs Female infections graph, Bagalkot talukawise spread,Bagalkot daily covid-19 trend">
+      <meta name="author" content="Amrut Deshpande">
+      <!-- Mobile Specific Metas
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- FONT
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600&display=swap" rel="stylesheet" type="text/css">
+      <!-- CSS
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <link rel="stylesheet" href="css/normalize.css">
+      <link rel="stylesheet" href="css/skeleton.css">
+      <script src="js/jquery.min.js"></script>
+	  
+      <!-- Favicon
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <!-- <link rel="icon" type="image/png" href="images/nblogo.png"> -->
+      <style>
+		.column-wrapper{
+			margin: 20px 0px;
+		}
+		body{ 
+			font: calibri 12px; 
+			text-align: center;
+		}
+		/* Larger than mobile */
+		@media (min-width: 600px) {
+		.container{
+			width:90%;
+		}
+		.column-wrapper{
+			margin:10px;
+		}
+		}
+      </style>
+     
+   </head>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js""></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
+   <body>
+      <div>
+         <a href="index.php" target="_new"><img  style="display:block;margin:0px auto;"  src='nblogo.jpg'></a>
+         <h5 style="text-align:center;">Covid-19 Analysis | <span><a href="index.php">Dashboard</a></span> | <span><a href="visualize.html">Visualize</a></h5>
+      </div>
+      <div class="container">
+	  <hr/>
+         <div class="row row-wrapper">
+		 <div class="five columns column-wrapper">
+               Positive Cases Trend 
+               <canvas id="DAILY" width="400" height="400"></canvas>
+            </div>
+			 <div class="two columns column-wrapper">
+               
+               
+            </div>
+            <div class="five columns column-wrapper">
+               Taluka Wise Spread
+               <canvas id="TALUKA" width="400" height="400"></canvas>
+            </div>
+            
+         </div>
+         <div class="row row-wrapper">
+            <div class="five columns column-wrapper">
+               Active vs Deceased vs Recovered
+               <canvas id="STATUS" width="400" height="400"></canvas>
+            </div>
+			 <div class="two columns column-wrapper">
+               
+               
+            </div>
+            <div class="five columns column-wrapper">
+              Distribution based on Gender
+               <canvas id="GENDER" width="400" height="400"></canvas>
+            </div>
+         </div>
+		  <div class="row row-wrapper">
+            <div class="five columns column-wrapper">
+               Age wise Distribution
+               <canvas id="AGE" width="400" height="400"></canvas>
+            </div>
+			 <div class="two columns column-wrapper"></div>
+			<div class="five columns column-wrapper">
+               Testing Count Comparison among states (with count>10,000)
+               <canvas id="STATES-TETSING" width="400" height="500"></canvas>
+            </div>
+               
+               
+            </div>
+			<div class="row row-wrapper">
+            <div class="eight columns column-wrapper">
+              Testing Count vs COVID-19 Positives Trend in Karnataka
+               <canvas id="KA-TESTING" width="500" height="500"></canvas>
+            </div>
+               
+               
+            </div>
+            
+         </div>
+      </div>
+      <script>
+         $(document).ready(function(){
+          
+         	var analysisUrl1  ="getJson.php?f=graph";
+            var analysisUrl  ="getJson.php?f=data/analysis";
+			var testDataUrl = "https://api.covid19india.org/state_test_data.json";
+			var d = new Date();
+			d.setMinutes(d.getMinutes() - 5);                 
+			var storageDate = localStorage.getItem("storedAt");
+			var sDate = new Date(storageDate);
+			console.log(sDate);
+			console.log(d);
+			if(sDate  !== null && d.getTime()<sDate.getTime()){//if not expired
+				drawGraphs(JSON.parse(localStorage.getItem("graphData")));
+				drawTetsingGraphs(JSON.parse(localStorage.getItem("testingData")));
+			}else{
+				console.log(localStorage.getItem("graphData"));
+				$.get(analysisUrl1,function(graphData){
+						
+						localStorage.setItem("graphData",JSON.stringify(graphData));
+						drawGraphs(graphData);
+				});
+				$.get(testDataUrl,function(graphData){
+						drawTetsingGraphs(graphData);
+						localStorage.setItem("testingData",JSON.stringify(graphData));
+					 });
+				localStorage.setItem("storedAt",new Date());
+			}
+               
+			function drawGraphs(graphData){
+         	/* STATUS GRAPH */	
+         	const Array = graphData.nodes;
+         	var Property = "status";
+         	var patientsByStatus = _.groupBy(Array, Property);
+         	var status = {'Active':0,'Deceased':0,'Recovered':0};
+         	var statusCount = [];
+         	$.each(patientsByStatus, function(key,value) {
+         		if(key.includes("Hosp") || key.includes("Isolated"))
+         		{
+         			key = "Active";
+         		}
+				status[key] = status[key] + value.length; 
+         	}); 
+         	var statusColors = ["#33498db","#2ca25f","#f03b20"];
+         		var statusCtx = document.getElementById('STATUS').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var statusConfig = {
+         		   type: 'doughnut',
+         		   data: {
+         			  labels: Object.keys(status),
+         			  datasets: [{
+         				 data: Object.values(status),
+         				 //backgroundColor: statusColors,
+         			  }]
+         		   },
+				    options: {
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.RdPu3'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(statusCtx, statusConfig);
+         		/* END STATUS GRAPH*/
+         		
+         		
+         	/* GENDER GRAPH */	
+         	const genderArray = graphData.nodes;
+         	Property = "gender";
+         	const patientsByGender = _.groupBy(genderArray, Property);
+         	var gender = [];
+         	var genderCount = [];
+         	var genderColors = [""];
+         	$.each(patientsByGender, function(key,value) {
+         		gender.push(key);
+         		genderCount.push(value.length);
+         		if(key.includes("Fe")){
+         			genderColors.push("#e13af2");
+         		}else{
+         			genderColors.push("#815cc5");
+         		}
+         	}); 
+         
+         			
+         		var ctx = document.getElementById('GENDER').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var config = {
+         		   type: 'pie',
+         		   data: {
+         			  labels: gender,
+         			  datasets: [{
+         				 data: genderCount,
+         				 //backgroundColor: genderColors,
+         			  }]
+         		   },
+				    options: {
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.PiYG4'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(ctx, config);
+         		/* END GENDER GRAPH*/
+         		
+
+		/* DAILY GRAPH */
+         	const dailyArray = graphData.nodes;
+         	const grpByProperty = "date";
+         	const countByDay = _.groupBy(dailyArray, grpByProperty);
+         	var dates = [];
+         	var dateCount = [];
+         	$.each(countByDay, function(key,value) {
+				var dateParts = key.split("/");
+				// month is 0-based, that's why we need dataParts[1] - 1
+				var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+         		dates.push(dateObject);
+         		dateCount.push(value.length);
+         	}); 
+			//console.log(dates);
+			var today = new Date();
+			if(!dates.includes(today)){
+				dates.push(today);
+				
+			}
+         	
+         		var ctx = document.getElementById('DAILY').getContext('2d');
+         		var config = {
+         		   type: 'bar',
+         		   data: {
+         			  labels: dates,
+         			  datasets: [{
+         				 label: 'Postive Cases Trend',
+         				 data: dateCount,
+         				// backgroundColor: 
+                    borderColor: ["#c45850"],
+         			  }]
+         		   },
+				   
+				    options: {
+					 scales: {
+						xAxes: [{
+							type: 'time',
+							distribution: 'linear'
+						  }],
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+						},
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.SetTwo5'
+										}
+								}
+						}
+         		};
+         	 
+         	var chart = new Chart(ctx, config);
+         	/* End Daily Trend*/
+         		
+        
+         	/* TALUKA WISE GRAPH */	
+         	const talukaArray = graphData.nodes;
+         	talukaProperty = "place";
+         	const countByTaluka = _.groupBy(talukaArray, talukaProperty);
+         	var taluka = {};
+         	var talukaCount = [];
+         	var talukaColors = ["#7e3bec", "#6f3875", "#e13af2", "#ef9d15", "#09d93c", "#e13af2", "#f7befb", "#cef1d7", "#09780a"];
+         	$.each(countByTaluka, function(key,value) {
+				if(key.toLowerCase().includes("jam")){
+					key  = "Jamkhandi";
+				}
+				if(key.toLowerCase().includes("bag")){
+					key  = "Bagalkot";
+				}
+				if(key.toLowerCase().includes("mud")){
+					key  = "Mudhol";
+				}
+				if(key in taluka){
+					taluka[key] = taluka [key] + value.length;
+				}else{
+					taluka[key] = value.length;
+				}
+         	}); 
+           		var ctx = document.getElementById('TALUKA').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var config = {
+         		   type: 'pie',
+         		   data: {
+         			  labels: Object.keys(taluka),
+         			  datasets: [{
+         				 data: Object.values(taluka),
+         				 //backgroundColor: talukaColors,
+         			  }]
+         		   },
+				    options: {
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.SetTwo5'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(ctx, config);
+         	/* END TALUKA WISE GRAPH*/
+			
+			
+			
+			/* Age WISE GRAPH */	
+         	const ageArray = graphData.nodes;
+         	ageProperty = "age";
+         	const countByAge = _.groupBy(ageArray, ageProperty);
+         	var age = [];
+         	var ageMap = {
+			"1-10":0,
+			"11-20":0,
+			"21-30":0,
+			"31-40":0,
+			"41-50":0,
+			"51-60":0,
+			"61-70":0,
+			"71-80":0,
+			"81-120":0,
+			};
+			
+         	//var talukaColors = ["#7e3bec", "#6f3875", "#e13af2", "#ef9d15", "#09d93c", "#e13af2", "#f7befb", "#cef1d7", "#09780a"];
+			$.each(countByAge, function(key,value) {
+				if(key<=10){
+					ageMap["1-10"]=ageMap["1-10"]+ value.length; 
+				}else if(key<=20){
+					ageMap["11-20"]=ageMap["11-20"]+ value.length;;
+				}else if(key<=30){
+					ageMap["21-30"]=ageMap["21-30"]+ value.length;;
+				}else if(key<=40){
+					ageMap["31-40"]=ageMap["31-40"]+ value.length;;
+				}else if(key<=50){
+					ageMap["41-50"]=ageMap["41-50"]+ value.length;;
+				}else if(key<=60){
+					ageMap["51-60"]=ageMap["51-60"]+ value.length;;
+				}else if(key<=70){
+					ageMap["61-70"]=ageMap["61-70"]+ value.length;;
+				}else if(key<=80){
+					ageMap["71-80"]=ageMap["71-80"]+ value.length;;
+				}else if(key<=120){
+					ageMap["81-120"]=ageMap["81-120"]+ value.length;;
+				}
+         	}); 
+         
+         		var ctx = document.getElementById('AGE').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var config = {
+         		   type: 'bar',
+         		   data: {
+         			  labels: Object.keys(ageMap),
+         			  datasets: [{
+					   label: 'Postive Cases Across age groups',
+         				 data: Object.values(ageMap),
+         				 //backgroundColor: talukaColors,
+         			  }]
+         		   },
+				    options: {
+					 scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					},
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.SetTwo5'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(ctx, config);
+         	/* END Age WISE GRAPH*/
+          
+		  }
+		  
+		  function drawTetsingGraphs(graphData){
+		          	
+         	/* STATES TESTING GRAPH */	
+         	
+			const stateArray = graphData.states_tested_data;
+         	var stateProperty = "state";
+         	var countByStates = _.groupBy(stateArray, stateProperty);
+         	var states = [];
+			var statesCount = [];
+			var dates = [];
+			$.each(countByStates, function(key,value) {
+			var cnt = value[value.length-1].totaltested;
+			var dateKey = value[value.length-1].updatedon;
+				if(cnt==""){
+					cnt = value[value.length-2].totaltested;
+					dateKey = value[value.length-2].updatedon;
+					if(cnt==""){
+							cnt = value[value.length-3].totaltested;
+							dateKey = value[value.length-3].updatedon;
+					}
+				}
+				if(cnt<40000){
+				
+				}else{
+				states.push(key+" ("+ dateKey +")");
+				statesCount.push(cnt);
+				}
+			}); 
+			var ctx = document.getElementById('STATES-TETSING').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var config = {
+         		   type: 'bar',
+         		   data: {
+         			  labels: states,
+         			  datasets: [{
+					   label: 'Number of samples tested',
+         				 data: statesCount,
+         				 //backgroundColor: talukaColors,
+						 
+         			  }]
+         		   },
+				    options: {
+					 scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					},
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.SetTwo5'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(ctx, config);
+				
+				
+				
+				/* KA TESTING TREND */
+				
+				
+				
+				/* STATES TESTING GRAPH */	
+         	
+			var KA ={};
+			var KaPos ={};
+			$.each(countByStates, function(key,value) {
+				$.each (value,function(k,daywise){
+					var dateParts = daywise.updatedon.split("/");
+					var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+					if(key=="Karnataka"){
+						obj = 
+						KA[dateObject] = daywise.totaltested;
+						KaPos[dateObject] = daywise.positive;
+					}
+				});
+			}); 
+						
+			
+			var ctx = document.getElementById('KA-TESTING').getContext('2d');
+         		//var ctx = canvas.getContext('2d');
+         		var config = {
+         		   type: 'line',
+         		   data: {
+         			  labels: Object.keys(KA),
+         			  datasets: [{
+					   label: 'Karnataka Tetsing Count',
+         				 data: Object.values(KA)
+         				 //backgroundColor: talukaColors,
+						 
+         			  },{
+					   label: 'Karnataka Postive Cases Count',
+         				 data: Object.values(KaPos)
+         				 //backgroundColor: talukaColors,
+						 
+         			  }]
+         		   },
+				    options: {
+					 scales: {
+						xAxes: [{
+							type: 'time',
+							distribution: 'linear'
+						  }],
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					},
+						plugins: {
+							colorschemes: {
+										scheme: 'brewer.SetTwo5'
+										}
+								}
+						}
+         		};
+         
+         		var chart = new Chart(ctx, config);
+				
+				/* END KA TEST TREND*/
+				
+				}
+         });
+         
+      </script>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-24636577-6"></script>
+      <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+         
+         gtag('config', 'UA-24636577-6');
+      </script>
+	  
+   </body>
+</html>
