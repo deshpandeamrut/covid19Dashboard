@@ -1,93 +1,126 @@
 <?php  
 date_default_timezone_set('Asia/Kolkata');
 $today = date("d/m/Y");
-//$today= "09/07/2020";
+// $today= "14/07/2020";
 $now = date("Mdhi");
-$rawData = file_get_contents("https://api.covid19india.org/raw_data10.json");
+$rawData = file_get_contents("https://api.covid19india.org/raw_data12.json");
 
 $rawData  = json_decode($rawData);
 $file = file_get_contents('./graph.json');
 
 $fileData = json_decode($file, true);
 $fileDatCopy = $fileData;
+$todaysBagalkotData=[];
 // print_r($rawData);
-$status = ['recovered','deceased'];
+$status = ['recovered','deceased','hospitalized'];
 $i=0;
 $j=0;
 foreach ($rawData->raw_data as $index => $obj){
 	
 	if(strtolower($obj->detecteddistrict) == "bagalkote"){
 		if(strtolower($obj->dateannounced) == $today){
-			if(!in_array(strtolower($obj->currentstatus), $status)){
+				
 				$pid = explode("-",$obj->statepatientnumber)[1];
-				if(!checkIfAlreadyAdded($fileData,$pid)){
-					$new['id']= $obj->entryid;
-					$new['pid']= $pid;
-					$new['influence'] = 0;
-					$new['zone'] =0;
-					$new['source'] =$obj->source1;
-					$new['place'] =$obj->detecteddistrict;
-					$new['comments'] = $obj->notes;
-					$new['date'] =$obj->dateannounced;
-					$new['status'] =$obj->currentstatus;
-					$new['recoveryDate'] ='';
-					$new['deceasedDate'] ='';
-					$new['age'] =$obj->agebracket;
-					$new['gender'] =$obj->gender;
-					array_push($fileData["nodes"], $new);
-					$i++;
-				}
-			}else{
-
-				/**Only Status Update**/
-				$j++;
-				//echo $obj->statepatientnumber."<br/>";
-				$fileData = updatePatientDetails($fileData,$obj);
-			}
+				
+				array_push($todaysBagalkotData,$obj);
+				
+			$i++;
 		}
 	}
 }
+echo "Added: $i<br/>";
+$i=0;
+$addedRecords =[];
+foreach ($todaysBagalkotData as $index => $obj){
+	//print_r($obj);
+	//echo "<br/>";
+	$pid = explode("-",$obj->statepatientnumber)[1];
+	if(!checkIfAlreadyAdded($fileData,$pid)){
+		$new['id']= $obj->entryid;
+		$new['pid']= $pid;
+		$new['influence'] = 0;
+		$new['zone'] =0;
+		$new['source'] =$obj->source1;
+		$new['place'] =$obj->detecteddistrict;
+		$new['comments'] = $obj->notes;
+		$new['date'] =$obj->dateannounced;
+		$new['status'] =$obj->currentstatus;
+		$new['recoveryDate'] ='';
+		$new['deceasedDate'] ='';
+		$new['age'] =$obj->agebracket;
+		$new['gender'] =$obj->gender;
+		array_push($fileData["nodes"], $new);
+		array_push($addedRecords, $new);
+		$i++;
 
-//print_r(json_encode($fileData['nodes']));
-echo "Added ".$i ." records";
-echo "<br/>";
-echo "Updated ".$j ." records";
-if($i>0){
-	file_put_contents("./data/backup/graph_".$now.".json", json_encode($fileDatCopy));
-	file_put_contents("./graph.json", json_encode($fileData));	
-	addUpdateAndPushNotify($i." new case(s) reported today.");
+	}
+	/*else{
+		$j++;
+		echo $obj->statepatientnumber."<br/>";
+		$fileData = updatePatientDetails($fileData,$obj);
+	}*/
+
+}
+echo "Added to file: $i<br/>";
+$j=0;
+$updatedRecords =[];
+foreach ($todaysBagalkotData as $index => $obj){
+	//print_r($obj);
+	//echo "<br/>";
+	$pid = explode("-",$obj->statepatientnumber)[1];
+	if(checkIfAlreadyAdded($fileData,$pid)){
+		
+		$j++;
+		//echo $obj->statepatientnumber ."<br/>";
+		$fileData = updatePatientDetails($fileData,$obj,$today);
+		//array_push($updateSData, $value);
+	}
+
 }
 
-	/**
-		To update stats data timestamp
-	*/
-	$getfile = file_get_contents('./data/statsData.json');
-    $all = json_decode($getfile, true);
-    $jsonfile = $all["stats"];
-    date_default_timezone_set('Asia/Kolkata');
-	$lastUpdate = date("M d h:i A");
-	$all["lastupdated"] = $lastUpdate;
-	file_put_contents("./data/statsData.json", json_encode($all));
+echo "<br/>-------<br/>";
+echo "Updated: $i<br/>";
+
+//print_r(json_encode($fileData['nodes']));
+//print_r($updateSData);
+
+//print_r($addedRecords);
+//print_r(json_encode($fileData['nodes']));
+/*echo "Added ".$i ." records";
+echo "<br/>";
+echo "Updated ".$j ." records";
+*/
+if($i>0 || $j>0){
+	file_put_contents("./data/backup/graph_".$now.".json", json_encode($fileDatCopy));
+	file_put_contents("./graph.json", json_encode($fileData));	
+	//addUpdateAndPushNotify($i." new case(s) reported today.");
+}
+
+	
 
 	
 
 
-function updatePatientDetails($fileData,$obj){
+function updatePatientDetails($fileData,$obj,$today){
 
-	$today = date("d/m/Y");
-	//$today="09/07/2020";
+	//$today = date("d/m/Y");
+	//$today="13/07/2020";
 	$pid = explode("-",$obj->statepatientnumber)[1];
 	//echo $pid;
 	foreach ($fileData['nodes'] as $key => $value) {
 		if($value['pid']==$pid){
+			echo "<br/>this-> ".$pid;
 			if($obj->currentstatus=="Recovered"){
-				$value['status'] = $obj->currentstatus;
-				$value['recoveryDate'] =$today;
+				if($value['status']!="Recovered"){
+					$value['status'] = $obj->currentstatus;
+					$value['recoveryDate'] =$today;
+				}
 			}else if($obj->currentstatus=="Deceased"){
-				echo $pid."<br/>";
-				$value['status'] = $obj->currentstatus;
-				$value['comments'] = $obj->notes;
-				$value['deceasedDate'] =$obj->dateannounced;
+				if($value['status']!="Deceased"){
+					$value['status'] = $obj->currentstatus;
+					$value['comments'] = $obj->notes;
+					$value['deceasedDate'] =$obj->dateannounced;
+				}
 			}
 			$fileData['nodes'][$key] = $value;
 		}
@@ -95,34 +128,13 @@ function updatePatientDetails($fileData,$obj){
 	}
 	return $fileData;
 }
-/**
-{"id":2,"pid":"P162","influence":30,"zone":0,"age":58,"gender":"M","source":"https:\/\/twitter.com\/nammabagalkot\/status\/1247084414669971457","place":"Bagalkot","comments":"Travel history to Kalburagi","date":"06\/04\/2020","status":"Recovered","recoveryDate":"21\/04\/2020","deceasedDate":""}
 
-"agebracket": "",
-			"contractedfromwhichpatientsuspected": "",
-			"currentstatus": "Recovered",
-			"dateannounced": "01/07/2020",
-			"detectedcity": "",
-			"detecteddistrict": "Bagalkote",
-			"detectedstate": "Karnataka",
-			"entryid": "95420",
-			"gender": "",
-			"nationality": "",
-			"notes": "",
-			"numcases": "1",
-			"patientnumber": "",
-			"source1": "https://t.me/Karnataka_KoViD19_Broadcast/4639",
-			"source2": "",
-			"source3": "",
-			"statecode": "KA",
-			"statepatientnumber": "KA-P8711",
-			"statuschangedate": "",
-			"typeoftransmission": ""
-*/
+
 function checkIfAlreadyAdded($fileData,$pid){
 
 foreach ($fileData['nodes'] as $key => $value) {
 	if($value['pid']==$pid){
+		//echo "Present Already with stored: $pid";
 		return true;
 	}
 

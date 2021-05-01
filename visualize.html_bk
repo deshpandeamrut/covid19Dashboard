@@ -257,8 +257,8 @@ svgElement.call(tip);
         .nodes(nodes)
         .links(edges)
         .gravity(0.05)
-        .charge(-95)
-        .linkDistance(25);
+        .charge(-75)
+        .linkDistance(55);
     //Add links to SVG
     var link = svgElement.selectAll(".link")
         .data(edges)
